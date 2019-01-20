@@ -1,32 +1,66 @@
 class Solution {
-    boolean isPalindrome(String s) {
-        int starting = 0;
-        int ending = s.length() - 1;
-        while(starting <= ending) {
-            Character start = s.charAt(starting);
-            Character end = s.charAt(ending);
-            if(start != end) {
-                return false;
+    void printArray(boolean[][] array) {
+        for(int i = 0; i < array[0].length; i++) {
+            for(int j = 0; j < array[0].length; j++) {
+                System.out.print("[" + array[i][j] + "]");
+                if(j == array[0].length - 1) {
+                    System.out.println();
+                }
             }
-            starting++;
-            ending--;
         }
-        return true;
     }
+    
+    String updateLongest(String s, String currentLongest, int i, int j) {
+        String result = currentLongest;
+        String curPalindrome = s.substring(i, j + 1);
+        if(result.length() < curPalindrome.length()) {
+            result = curPalindrome;
+        }
+        return result;
+    }
+    
     public String longestPalindrome(String s) {
-        int stringEnd = s.length();
         String result = "";
-        for(int i = 0; i <= stringEnd; i++) {
-            for(int j = i + 1; j <= stringEnd; j++) {
-                String curString = s.substring(i, j);
-                boolean isValid = isPalindrome(curString);
+        int stringEnd = s.length();
+        boolean[][] isPalindrome = new boolean[stringEnd][stringEnd];
+        
+        if(stringEnd < 2) {
+            return s;
+        }
+        
+        //base cases:
+        //string of length 1 is always a palindrome
+        for(int i = 0; i < stringEnd; i++) {
+            isPalindrome[i][i] = true;
+            if(i == 0) {
+                result = updateLongest(s, result, i, i);
+            }
+        }
+        
+        //string of length 2 where both characters match is palindrome
+        for(int i = 0; i < stringEnd - 1; i++) {
+            boolean isValid = s.charAt(i) == s.charAt(i + 1);
+            isPalindrome[i][i + 1] = isValid;
+            isPalindrome[i + 1][i] = isValid;
+            if(isValid) {
+                result = updateLongest(s, result, i, i + 1);
+            }
+        }
+        
+        for(int i = stringEnd; i >= 0; i--) {
+            for(int j = i + 1; j < stringEnd; j++) {
+                boolean isValid = isPalindrome[i + 1][j - 1] && s.charAt(i) == s.charAt(j);
+                isPalindrome[i][j] = isValid;
                 if(isValid) {
-                    if(curString.length() > result.length()) {
-                        result = curString;
+                    String curPalindrome = s.substring(i, j + 1);
+                    if(result.length() < curPalindrome.length()) {
+                        result = curPalindrome;
                     }
                 }
             }
         }
+        
+        //printArray(isPalindrome);
         
         return result;
     }
